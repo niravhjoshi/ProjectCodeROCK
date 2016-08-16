@@ -119,6 +119,7 @@ def main():
     print "You have selected Account =>  {}".format(accountname[acctname])
     gacctname =accountname[acctname]
     print gacctname
+    #Add logic re enter in loop when user done some mistake
     #Add help into user input.
     #Selecting for server name.
     for appsrv in appserverlist:
