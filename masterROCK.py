@@ -6,8 +6,6 @@ from bz2 import decompress
 import  re
 
 
-#Add Input to point user where there download zip files are located in directory.
-
 accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB'}
 appserverlist ={'1':'App1','2':'App2','98':'App98','99':'App99'}
 moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul','8':'Aug','9':'Sep','10':'Oct','11':'Nov','12':'Dec'}
@@ -23,7 +21,7 @@ pattern2 = re.compile('\d+ ERROR [()[\]{}][a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-
 regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.+[[\]{}]')
 
 
-def DecompressBZ2files():
+def DecompressBZ2files(userInDir):
     Decomdirpath = Decompressfilepath+gsrvname
     bz2filepath = pathcompressfile+gsrvname
     if not os.path.exists(Decomdirpath):
@@ -109,35 +107,53 @@ def main():
     #select Month Name
     for mname in moname:
         print(mname, moname[mname])
-    miname = raw_input("Which account you want to go with Please enter number:-")
+    miname = raw_input("Which month you want to go with Please enter number:-")
     print "You have selected Month =>  {}".format(moname[miname])
     gmoname = moname[miname]
     print gmoname
 
-    #Select account Name
+    # Select account Name
     for accname in accountname:
-        print(accname,accountname[accname])
+        print(accname, accountname[accname])
     acctname = raw_input("Which account you want to go with Please enter number:-")
     print "You have selected Account =>  {}".format(accountname[acctname])
-    gacctname =accountname[acctname]
+    gacctname = accountname[acctname]
     print gacctname
-    #Add logic re enter in loop when user done some mistake
-    #Add help into user input.
-    #Selecting for server name.
-    for appsrv in appserverlist:
-        print(appsrv,appserverlist[appsrv])
-    appsrvname = raw_input("which App Server you want to go with LogAnalysis:-")
-    appsrvname = str(appsrvname)
-    if appsrvname not in appserverlist:
-        print "Sorry Wrong Input:"
-        exit()
-    else:
-        print "You have selected App Server => {}".format(appserverlist[appsrvname])
-        gsrvname =appserverlist[appsrvname]
-        print gsrvname
-    # #Calling this fucntion for decompres4
-    DecompressBZ2files()
-    # s all files from each app server
+
+    #select account name
+    while True:
+
+        try:
+            for appsrv in appserverlist:
+                print(appsrv, appserverlist[appsrv])
+            appsrvname = int(raw_input("Which Server  you want to go with Please enter number:-"))
+
+        except ValueError:
+            if appsrvname not in appserverlist:
+                print "Sorry Wrong Input:"
+            continue
+
+        else:
+            appsrvname = str(appsrvname)
+            if appsrvname not in appserverlist:
+                print "Your number is not in server list"
+                continue
+            print "You have selected App Server => {}".format(appserverlist[appsrvname])
+            gsrvname =appserverlist[appsrvname]
+            print gsrvname
+            break
+
+
+
+    # Add Input to point user where there download zip files are located in directory.
+    user_dirInput = raw_input("Please enter file path where you have downloaded files in folder:->")
+    assert os.path.exists(user_dirInput),"I could not find that path in your file system please ensure it is correct!!! " +str(user_dirInput)
+
+
+
+
+    DecompressBZ2files(str(user_dirInput))
+
     PatternMatchERROR()#Calling ERROR Keyword matching function
     CountRepoErrorinConclufile()
     MatchandYankerrors()
