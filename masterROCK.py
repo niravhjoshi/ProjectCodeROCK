@@ -10,8 +10,8 @@ accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB'}
 appserverlist ={'1':'App1','2':'App2','98':'App98','99':'App99'}
 moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul','8':'Aug','9':'Sep','10':'Oct','11':'Nov','12':'Dec'}
 
-errorrepopath = "C:\\ROCKwall\\July Data\\ErrorDict.txt"
-pathcompressfile ="C:\\ROCKwall\\July Data\\RawData\\"
+#errorrepopath = "C:\\ROCKwall\\July Data\\ErrorDict.txt"
+#pathcompressfile ="C:\\ROCKwall\\July Data\\RawData\\"
 
 Decompressfilepath = "C:\\ROCKwall\\July Data\\RawData\\Decompress\\"
 
@@ -122,7 +122,6 @@ def main():
 
     #select account name
     while True:
-
         try:
             for appsrv in appserverlist:
                 print(appsrv, appserverlist[appsrv])
@@ -146,15 +145,31 @@ def main():
 
 
     # Add Input to point user where there download zip files are located in directory.
-    user_dirInput = raw_input("Please enter file path where you have downloaded files in folder:->")
-    assert os.path.exists(user_dirInput),"I could not find that path in your file system please ensure it is correct!!! " +str(user_dirInput)
+    while True:
+        user_dirInput = raw_input("Please enter file path where you have downloaded files in folder:->")
+        if os.path.exists(user_dirInput) is False:
+            print "I could not find that path in your file system please ensure it is correct!!! " +str(user_dirInput)
+            continue
+        else:
+            pathcompressfile = str(user_dirInput)
+            break
+
+    while True:
+        user_errordict =  raw_input("Please enter full path of error dict file name:->")
+        if os.path.exists(user_errordict) is False:
+            print "I could not find that path in your file system please ensure it is correct!!! " + str(user_errordict)
+            continue
+        else:
+            pathcompressfile = str(user_errordict)
+            break
 
 
 
 
+
+    #Calling All function one by one.
     DecompressBZ2files(str(user_dirInput))
-
-    PatternMatchERROR()#Calling ERROR Keyword matching function
+    PatternMatchERROR(str(user_errordict))#Calling ERROR Keyword matching function
     CountRepoErrorinConclufile()
     MatchandYankerrors()
 
