@@ -22,14 +22,15 @@ regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]
 
 
 def DecompressBZ2files(userInDir,userOpDir):
-    Decomdirpath = userInDir+gsrvname
-    bz2filepath = userOpDir+gsrvname
-    if not os.path.exists(Decomdirpath):
+    Decomdirpath = userOpDir+"\\"+gsrvname
+    bz2filepath = userInDir+"\\"+gsrvname
+    if os.path.exists(Decomdirpath) is False:
         os.makedirs(Decomdirpath)
+        print "created dir decom"
 
     for file in os.listdir(bz2filepath):
-        archive_path = os.path.join(userInDir+gsrvname, file)
-        outfile_path = os.path.join(userOpDir+gsrvname, file[:-4])
+        archive_path = os.path.join(userInDir+"\\"+gsrvname, file)
+        outfile_path = os.path.join(userOpDir+"\\"+gsrvname, file[:-4])
         with open(archive_path, 'rb') as source, open(outfile_path, 'wb') as dest:
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
