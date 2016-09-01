@@ -13,7 +13,7 @@ moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul',
 #errorrepopath = "C:\\ROCKwall\\July Data\\ErrorDict.txt"
 #pathcompressfile ="C:\\ROCKwall\\July Data\\RawData\\"
 
-Decompressfilepath = "C:\\ROCKwall\\July Data\\RawData\\Decompress\\"
+#Decompressfilepath = "C:\\ROCKwall\\July Data\\RawData\\Decompress\\"
 
 #Regex pattern example
 pattern1 =re.compile('^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3}')
@@ -21,15 +21,15 @@ pattern2 = re.compile('\d+ ERROR [()[\]{}][a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-
 regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.+[[\]{}]')
 
 
-def DecompressBZ2files(userInDir):
-    Decomdirpath = Decompressfilepath+gsrvname
-    bz2filepath = pathcompressfile+gsrvname
+def DecompressBZ2files(userInDir,userOpDir):
+    Decomdirpath = userInDir+gsrvname
+    bz2filepath = userOpDir+gsrvname
     if not os.path.exists(Decomdirpath):
         os.makedirs(Decomdirpath)
 
     for file in os.listdir(bz2filepath):
-        archive_path = os.path.join(pathcompressfile+gsrvname, file)
-        outfile_path = os.path.join(Decompressfilepath+gsrvname, file[:-4])
+        archive_path = os.path.join(userInDir+gsrvname, file)
+        outfile_path = os.path.join(userOpDir+gsrvname, file[:-4])
         with open(archive_path, 'rb') as source, open(outfile_path, 'wb') as dest:
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
@@ -154,6 +154,19 @@ def main():
             pathcompressfile = str(user_dirInput)
             break
 
+    #Please enter decompress path for your bz2 file if it is not there create it.
+    while True:
+        user_DecomDir = raw_input("Please enter path or location where you want to decompress files:->")
+        if os.path.exists(user_DecomDir) is False:
+            os.makedirs(user_DecomDir)
+            print "New Dir is created at following location" +str(user_DecomDir)
+            decompath = str(user_DecomDir)
+            break
+        else:
+            print "Directory already there"
+            decompath = str(user_DecomDir)
+            break
+
     while True:
         user_errordict =  raw_input("Please enter full path of error dict file name:->")
         if os.path.exists(user_errordict) is False:
@@ -168,7 +181,7 @@ def main():
 
 
     #Calling All function one by one.
-    DecompressBZ2files(str(user_dirInput))
+    DecompressBZ2files(str(user_dirInput),str(user_DecomDir))
     PatternMatchERROR(str(user_errordict))#Calling ERROR Keyword matching function
     CountRepoErrorinConclufile()
     MatchandYankerrors()
