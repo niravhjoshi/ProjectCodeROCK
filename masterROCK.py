@@ -20,7 +20,7 @@ pattern1 =re.compile('^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3}')
 pattern2 = re.compile('\d+ ERROR [()[\]{}][a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+[()[\]{}]')
 regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.+[[\]{}]')
 
-
+#THis function will decompress files for respecitive app server
 def DecompressBZ2files(userInDir,userOpDir):
     Decomdirpath = userOpDir+"\\"+gsrvname
     bz2filepath = userInDir+"\\"+gsrvname
@@ -35,9 +35,10 @@ def DecompressBZ2files(userInDir,userOpDir):
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
 
-def PatternMatchERROR():
-    newpath = Decompressfilepath+gsrvname
-    opfilepath = Decompressfilepath
+#This function will create new file named conclusion which will contain all error related lines only.
+def PatternMatchERROR(userOpDir):
+    newpath = userOpDir+"\\"+gsrvname
+    opfilepath = newpath
     concluerrfile = open(os.path.join(opfilepath,gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname),"w")
     for eachfiles in os.listdir(newpath):
         i = 0
@@ -52,9 +53,9 @@ def PatternMatchERROR():
 
 
 #This function will just count error message reference to error dict and our conclusion file
-def CountRepoErrorinConclufile():
-    Countferrorrepo = errorrepopath
-    Countconclufile = os.path.join(Decompressfilepath,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
+    Countferrorrepo = usererrordictpath
+    Countconclufile = os.path.join(userOpDir+"\\"+gsrvname,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     Countferrorfile = open(Countferrorrepo)
 
     for errlines in Countferrorfile:  # Pick each line from error_dict
@@ -72,9 +73,9 @@ def CountRepoErrorinConclufile():
 #Use delimeter  format and export this result in to CSV -- Add feature
 
 #This function will be matching error lines from error repo files and if matched it will yank those lines from the files.
-def MatchandYankerrors():
-    ferrorrepo = errorrepopath
-    conclufile = os.path.join(Decompressfilepath,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+def MatchandYankerrors(usererrodict,userOpDir):
+    ferrorrepo = usererrodict
+    conclufile = os.path.join(userOpDir+"\\"+gsrvname,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     ferrorfile = open(ferrorrepo)
     output = []
 
@@ -174,7 +175,7 @@ def main():
             print "I could not find that path in your file system please ensure it is correct!!! " + str(user_errordict)
             continue
         else:
-            pathcompressfile = str(user_errordict)
+            errordictfilepath = str(user_errordict)
             break
 
 
@@ -183,9 +184,9 @@ def main():
 
     #Calling All function one by one.
     DecompressBZ2files(str(user_dirInput),str(user_DecomDir))
-    PatternMatchERROR(str(user_errordict))#Calling ERROR Keyword matching function
-    CountRepoErrorinConclufile()
-    MatchandYankerrors()
+    PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
+    CountRepoErrorinConclufile(str(user_errordict),str(user_DecomDir))
+    MatchandYankerrors(str(user_errordict),str(user_DecomDir))
 
 
 if __name__ == '__main__':
