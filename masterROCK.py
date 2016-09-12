@@ -19,7 +19,7 @@ regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]
 
 #THis function will decompress files for respecitive app server
 def DecompressBZ2files(userInDir,userOpDir):
-    '''
+
     Decomdirpath = userOpDir+"\\"+gsrvname
     bz2filepath = userInDir+"\\"+gsrvname
     if os.path.exists(Decomdirpath) is False:
@@ -32,7 +32,8 @@ def DecompressBZ2files(userInDir,userOpDir):
         with open(archive_path, 'rb') as source, open(outfile_path, 'wb') as dest:
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
-'''
+
+
 #This function will create new file named conclusion which will contain all error related lines only.
 def PatternMatchERROR(userOpDir):
     newpath = userOpDir+"\\"+gsrvname
@@ -73,14 +74,16 @@ def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
                 newDate = new_eachlineinconfile[:10]
                 if newDate not in groupbyDate:
                     groupbyDate.append(new_eachlineinconfile[:10])
+                    errcnt = 0
                     print "Group Date==============================>:{}".format(groupbyDate[-1])
 
 
 
             if Countnewerrlines in new_eachlineinconfile:
                 c=c+1
-                print "This error {} came on {} these many times{} ".format(Countnewerrlines,c,groupbyDate[-1])
-        print "This line counts {}  ====>{}".format(Countnewerrlines,c)
+                errcnt = errcnt +1 # this count only set to 0 after new error picked up.
+                print "This error {} came on {} these many times{} ".format(Countnewerrlines,errcnt,groupbyDate[-1])
+        print "\n\nThis line counts {}  ====>{}".format(Countnewerrlines,c)
 
 #Use delimeter  format and export this result in to CSV -- Add feature
 
@@ -193,7 +196,7 @@ def main():
 
     #Calling All function one by one.
     DecompressBZ2files(str(user_dirInput),str(user_DecomDir))
-    #PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
+    PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
     CountRepoErrorinConclufile(str(user_errordict),str(user_DecomDir))
     #MatchandYankerrors(str(user_errordict),str(user_DecomDir))
 
