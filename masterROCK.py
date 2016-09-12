@@ -198,7 +198,7 @@ def main():
     DecompressBZ2files(str(user_dirInput),str(user_DecomDir))
     PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
     CountRepoErrorinConclufile(str(user_errordict),str(user_DecomDir))
-    #MatchandYankerrors(str(user_errordict),str(user_DecomDir))
+    MatchandYankerrors(str(user_errordict),str(user_DecomDir))
 
 
 if __name__ == '__main__':
