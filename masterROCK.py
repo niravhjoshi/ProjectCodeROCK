@@ -12,12 +12,14 @@ moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul',
 
 
 #Regex pattern example
-pattern1 =re.compile('^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3}')
+date_pattern1 =re.compile('^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3}')
+only_datePattern2 = re.compile('^\d{4}-\d{2}-\d{2}')
 pattern2 = re.compile('\d+ ERROR [()[\]{}][a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+[()[\]{}]')
 regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]+.+[[\]{}]')
 
 #THis function will decompress files for respecitive app server
 def DecompressBZ2files(userInDir,userOpDir):
+    '''
     Decomdirpath = userOpDir+"\\"+gsrvname
     bz2filepath = userInDir+"\\"+gsrvname
     if os.path.exists(Decomdirpath) is False:
@@ -30,7 +32,7 @@ def DecompressBZ2files(userInDir,userOpDir):
         with open(archive_path, 'rb') as source, open(outfile_path, 'wb') as dest:
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
-
+'''
 #This function will create new file named conclusion which will contain all error related lines only.
 def PatternMatchERROR(userOpDir):
     newpath = userOpDir+"\\"+gsrvname
@@ -50,20 +52,34 @@ def PatternMatchERROR(userOpDir):
 
 #This function will just count error message reference to error dict and our conclusion file
 def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
+
     Countferrorrepo = usererrordictpath
     Countconclufile = os.path.join(userOpDir+"\\"+gsrvname,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     Countferrorfile = open(Countferrorrepo)
 
-    for errlines in Countferrorfile:  # Pick each line from error_dict
+# We need put logic where after picking up each line from error dict file  it will search lines using date wise rather than just over seach from
+#Conclusion File through which we will get more granualar report about understanding error pattern datewise.
+    for errlines in Countferrorfile:
+        groupbyDate = []  # Create List for the Dates Entries to be included.
         Countnewerrlines = errlines.strip() # Strip error dict file line for any unwanted things
         confile = open(Countconclufile,"r+")#This will keep opening file every time when we need new error to search.
         confilelines = confile.readlines() #This will read all lines from file.
         confile.seek(0)
         c=0
-        for eachlineinconfile in confilelines:
-            new_eachlineinconfile = eachlineinconfile.strip()
+        for eachlineinconfile in confilelines:  # Pick each line from error_dict
+            new_eachlineinconfile = eachlineinconfile.strip()  #
+
+            if re.match(only_datePattern2,new_eachlineinconfile):
+                newDate = new_eachlineinconfile[:10]
+                if newDate not in groupbyDate:
+                    groupbyDate.append(new_eachlineinconfile[:10])
+                    print "Group Date==============================>:{}".format(groupbyDate[-1])
+
+
+
             if Countnewerrlines in new_eachlineinconfile:
                 c=c+1
+                print "This error {} came on {} these many times{} ".format(Countnewerrlines,c,groupbyDate[-1])
         print "This line counts {}  ====>{}".format(Countnewerrlines,c)
 
 #Use delimeter  format and export this result in to CSV -- Add feature
@@ -177,9 +193,9 @@ def main():
 
     #Calling All function one by one.
     DecompressBZ2files(str(user_dirInput),str(user_DecomDir))
-    PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
+    #PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
     CountRepoErrorinConclufile(str(user_errordict),str(user_DecomDir))
-    MatchandYankerrors(str(user_errordict),str(user_DecomDir))
+    #MatchandYankerrors(str(user_errordict),str(user_DecomDir))
 
 
 if __name__ == '__main__':
