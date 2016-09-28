@@ -6,7 +6,7 @@ from bz2 import decompress
 import  re
 
 
-accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB'}
+accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB','6':'FIDO','7':'IBMCons'}
 appserverlist ={'1':'App1','2':'App2','98':'App98','99':'App99'}
 moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul','8':'Aug','9':'Sep','10':'Oct','11':'Nov','12':'Dec'}
 
