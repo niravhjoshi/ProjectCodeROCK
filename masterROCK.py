@@ -4,7 +4,7 @@ import os
 import bz2
 from bz2 import decompress
 import  re
-
+import json
 
 accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB','6':'FIDO','7':'IBMCons'}
 appserverlist ={'1':'App1','2':'App2','98':'App98','99':'App99'}
@@ -36,6 +36,7 @@ def DecompressBZ2files(userInDir,userOpDir):
 
 #This function will create new file named conclusion which will contain all error related lines only.
 def PatternMatchERROR(userOpDir):
+    out_file = open("test.json", "w")
     newpath = userOpDir+"\\"+gsrvname
     opfilepath = newpath
     concluerrfile = open(os.path.join(opfilepath,gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname),"w")
@@ -49,6 +50,13 @@ def PatternMatchERROR(userOpDir):
                 print >> concluerrfile,eachlinesinfile,
                 i = i+1
         print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-10:],i)
+
+        error_count_json = {"cust_name": gacctname, "Month_name": gmoname, "Appsrv_name": gsrvname,"date_stamp": eachfiles[-10:],"ErrorCounts":i}
+        print error_count_json
+        json_str_err = json.dumps(error_count_json)
+        print >> out_file, json_str_err
+        #py_data = json.loads(json_str_err)
+        #print py_data
 
 
 #This function will just count error message reference to error dict and our conclusion file
