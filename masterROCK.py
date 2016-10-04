@@ -37,33 +37,37 @@ def DecompressBZ2files(userInDir,userOpDir):
 #This function will create new file named conclusion which will contain all error related lines only.
 def PatternMatchERROR(userOpDir):
     out_file = open("test.json", "w")
-    newpath = userOpDir+"\\"+gsrvname
+    #newpath = userOpDir+"\\"+gsrvname
+    newpath = userOpDir
+    print newpath
     opfilepath = newpath
     concluerrfile = open(os.path.join(opfilepath,gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname),"w")
+    newpath = userOpDir+"\\"+gsrvname
+    print newpath
     for eachfiles in os.listdir(newpath):
         i = 0
-        openfilefullpath = os.path.join(newpath,eachfiles)
-        openeachfile = open(openfilefullpath,'r')
+        print eachfiles
+        if os.path.exists(newpath+"\\"+eachfiles):
+            openeachfile=open(newpath+"\\"+eachfiles,'r')
+            for eachlinesinfile in openeachfile:
+                if re.match("(.*)(E)(R)(R)(O)(R)(.*)", eachlinesinfile, re.M):
+                    print >> concluerrfile,eachlinesinfile,
+                    i = i+1
+            print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-10:],i)
+            error_count_json = {"cust_name": gacctname, "Month_name": gmoname, "Appsrv_name": gsrvname,"date_stamp": eachfiles[-10:],"ErrorCounts":i}
+            print error_count_json
+            json_str_err = json.dumps(error_count_json)
+            print >> out_file, json_str_err
 
-        for eachlinesinfile in openeachfile:
-            if re.match("(.*)(E)(R)(R)(O)(R)(.*)", eachlinesinfile, re.M):
-                print >> concluerrfile,eachlinesinfile,
-                i = i+1
-        print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-10:],i)
-
-        error_count_json = {"cust_name": gacctname, "Month_name": gmoname, "Appsrv_name": gsrvname,"date_stamp": eachfiles[-10:],"ErrorCounts":i}
-        print error_count_json
-        json_str_err = json.dumps(error_count_json)
-        print >> out_file, json_str_err
-        #py_data = json.loads(json_str_err)
-        #print py_data
+        else:
+            print "No such file present"
 
 
 #This function will just count error message reference to error dict and our conclusion file
 def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
 
     Countferrorrepo = usererrordictpath
-    Countconclufile = os.path.join(userOpDir+"\\"+gsrvname,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+    Countconclufile = os.path.join(userOpDir+"\\"+(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     Countferrorfile = open(Countferrorrepo)
 
 # We need put logic where after picking up each line from error dict file  it will search lines using date wise rather than just over seach from
@@ -98,7 +102,7 @@ def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
 #This function will be matching error lines from error repo files and if matched it will yank those lines from the files.
 def MatchandYankerrors(usererrodict,userOpDir):
     ferrorrepo = usererrodict
-    conclufile = os.path.join(userOpDir+"\\"+gsrvname,(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+    conclufile = os.path.join(userOpDir+"\\",(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     ferrorfile = open(ferrorrepo)
     output = []
 
