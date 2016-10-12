@@ -5,7 +5,14 @@ import bz2
 from bz2 import decompress
 import  re
 import json
+import pymongo
+from pymongo.mongo_client import MongoClient
 
+#Adding mongodb connection to my server docker DB container
+client = MongoClient('mongodb://localhost:27017')
+db = client.get_database('centurions')
+
+#Dict object for user input
 accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB','6':'FIDO','7':'IBMCons'}
 appserverlist ={'1':'App1','2':'App2','98':'App98','99':'App99'}
 moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul','8':'Aug','9':'Sep','10':'Oct','11':'Nov','12':'Dec'}
@@ -36,7 +43,7 @@ def DecompressBZ2files(userInDir,userOpDir):
 
 #This function will create new file named conclusion which will contain all error related lines only.
 def PatternMatchERROR(userOpDir):
-    out_file = open("test.json", "w")
+    #out_file = open("DateWiseErrorCnt.json", "w")
     #newpath = userOpDir+"\\"+gsrvname
     newpath = userOpDir
     print newpath
@@ -54,10 +61,26 @@ def PatternMatchERROR(userOpDir):
                     print >> concluerrfile,eachlinesinfile,
                     i = i+1
             print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-10:],i)
-            error_count_json = {"cust_name": gacctname, "Month_name": gmoname, "Appsrv_name": gsrvname,"date_stamp": eachfiles[-10:],"ErrorCounts":i}
-            print error_count_json
-            json_str_err = json.dumps(error_count_json)
-            print >> out_file, json_str_err
+            #error_count_json = {, , }
+
+            #MongoDB collection name
+            # DateWiseErrCounts insert document into this collection using the following method
+            #print "You have selected MongoDB collections name as {}".format(db.collection_names())
+            try:
+                resultforrow = db.DateWiseErrCounts.insert_one\
+                (
+                        {
+                        "cust_name": gacctname,
+                        "Month_name":gmoname,"Appsrv_name": gsrvname,
+                        "date_stamp": eachfiles[-10:], "ErrorCounts": i
+                        }
+                )
+                print "Your result is inserted fine{}".format(resultforrow.inserted_id)
+                #print error_count_json
+                #json_str_err = json.dumps(error_count_json)
+                #print >> out_file, json_str_err
+            except:
+                print "There is something wrong in try"
 
         else:
             print "No such file present"
