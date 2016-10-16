@@ -118,6 +118,27 @@ def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
                 c=c+1
                 errcnt = errcnt +1 # this count only set to 0 after new error picked up.
                 print "This error {} came on {} these many times{} ".format(Countnewerrlines,errcnt,groupbyDate[-1])
+                # MongoDB collection name
+                # DateWiseDetailKnownErrCounts insert document into this collection using the following method
+                # print "You have selected MongoDB collections name as {}".format(db.collection_names())
+                try:
+                    resultforrow = db.DateWiseDetailKnownErrCounts.insert_one \
+                            (
+                            {
+                                "cust_name": gacctname,
+                                "Month_name": gmoname,
+                                "Appsrv_name": gsrvname,
+                                "Err_Name":Countnewerrlines,
+                                "ErrorCounts":errcnt,
+                                "date_day":groupbyDate[-1]
+                            }
+                        )
+                    print "Your result is inserted fine{}".format(resultforrow.inserted_id)
+
+                except:
+                    print "There is something wrong in try"
+
+
         print "\n\nThis line counts {}  ====>{}".format(Countnewerrlines,c)
 
 #Use delimeter  format and export this result in to CSV -- Add feature
@@ -224,9 +245,6 @@ def main():
         else:
             errordictfilepath = str(user_errordict)
             break
-
-
-
 
 
     #Calling All function one by one.
