@@ -76,9 +76,7 @@ def PatternMatchERROR(userOpDir):
                         }
                 )
                 print "Your result is inserted fine{}".format(resultforrow.inserted_id)
-                #print error_count_json
-                #json_str_err = json.dumps(error_count_json)
-                #print >> out_file, json_str_err
+
             except:
                 print "There is something wrong in try"
 
