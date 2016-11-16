@@ -7,10 +7,15 @@ import  re
 import json
 import pymongo
 from pymongo.mongo_client import MongoClient
+import peewee
+from peewee import *
+from DBORM import *
+
 
 #Adding mongodb connection to my server docker DB container
-client = MongoClient('mongodb://localhost:27017')
-db = client.get_database('centurions')
+#client = MongoClient('mongodb://localhost:27017')
+#db = client.get_database('centurions')
+#db = MySQLDatabase('centuriondb',user='root',password='gravitant')
 
 #Dict object for user input
 accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB','6':'FIDO','7':'IBMCons'}
@@ -63,6 +68,22 @@ def PatternMatchERROR(userOpDir):
             print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-10:],i)
             #error_count_json = {, , }
 
+            #MySQL DB insert code over here
+            try:
+                Datewiseerrcnts = DateWiseErrCounts({
+                                                    "cust_name": gacctname,
+                                                    "month_name":gmoname,
+                                                    "appsrv_name": gsrvname,
+                                                    "date_stamp": eachfiles[-10:],
+                                                    "err_counts": i
+                                                    })
+                Datewiseerrcnts.save()
+                print "Your result is inserted fine{}"
+
+            except:
+                print "There is something wrong in try"
+
+            '''
             #MongoDB collection name
             # DateWiseErrCounts insert document into this collection using the following method
             #print "You have selected MongoDB collections name as {}".format(db.collection_names())
@@ -71,8 +92,10 @@ def PatternMatchERROR(userOpDir):
                 (
                         {
                         "cust_name": gacctname,
-                        "Month_name":gmoname,"Appsrv_name": gsrvname,
-                        "date_stamp": eachfiles[-10:], "ErrorCounts": i
+                        "Month_name":gmoname,
+                        "Appsrv_name": gsrvname,
+                        "date_stamp": eachfiles[-10:],
+                        "ErrorCounts": i
                         }
                 )
                 print "Your result is inserted fine{}".format(resultforrow.inserted_id)
@@ -82,7 +105,7 @@ def PatternMatchERROR(userOpDir):
 
         else:
             print "No such file present"
-
+        '''
 
 #This function will just count error message reference to error dict and our conclusion file
 def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
