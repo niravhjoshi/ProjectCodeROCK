@@ -15,7 +15,7 @@ from DBORM import *
 #Adding mongodb connection to my server docker DB container
 #client = MongoClient('mongodb://localhost:27017')
 #db = client.get_database('centurions')
-#db = MySQLDatabase('centuriondb',user='root',password='gravitant')
+db = MySQLDatabase('centuriondb',user='root',password='gravitant')
 
 #Dict object for user input
 accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB','6':'FIDO','7':'IBMCons'}
@@ -70,17 +70,11 @@ def PatternMatchERROR(userOpDir):
 
             #MySQL DB insert code over here
             try:
-                Datewiseerrcnts = DateWiseErrCounts({
-                                                    "cust_name": gacctname,
-                                                    "month_name":gmoname,
-                                                    "appsrv_name": gsrvname,
-                                                    "date_stamp": eachfiles[-10:],
-                                                    "err_counts": i
-                                                    })
-                Datewiseerrcnts.save()
-                print "Your result is inserted fine{}"
+                DateWiseErrCounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,date_stamp=eachfiles[-10:],err_counts=i).save()
 
-            except:
+                print "Your result is inserted fine in DateWiseErrCounts"
+
+            except peewee.InternalError:
                 print "There is something wrong in try"
 
             '''
@@ -139,6 +133,15 @@ def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
                 c=c+1
                 errcnt = errcnt +1 # this count only set to 0 after new error picked up.
                 print "This error {} came on {} these many times{} ".format(Countnewerrlines,errcnt,groupbyDate[-1])
+                #MySQL Connection and insert
+                try:
+                    DateWiseDetailKnownErrCounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,err_name=Countnewerrlines,err_counts=errcnt,date_day=groupbyDate[-1]).save()
+                    print "Your result is inserted fine in DateWiseDetailKnownErrCounts"
+
+                except peewee.InternalError:
+                    print "There is something wrong in try"
+
+                '''
                 # MongoDB collection name
                 # DateWiseDetailKnownErrCounts insert document into this collection using the following method
                 # print "You have selected MongoDB collections name as {}".format(db.collection_names())
@@ -158,7 +161,7 @@ def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
 
                 except:
                     print "There is something wrong in try"
-
+                '''
 
         print "\n\nThis line counts {}  ====>{}".format(Countnewerrlines,c)
 

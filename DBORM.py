@@ -4,6 +4,7 @@ from peewee import *
 
 db = MySQLDatabase('centuriondb', user='root',passwd='gravitant')
 
+'''
 class Book(peewee.Model):
     author = peewee.CharField()
     title = peewee.TextField()
@@ -16,30 +17,39 @@ book = Book(author="me", title='Peewee is cool')
 book.save()
 for book in Book.filter(author="me"):
     print book.title
-
+'''
 
 class DateWiseDetailKnownErrCounts(peewee.Model):
-    id_field = PrimaryKeyField(),
-    cust_name= peewee.CharField(),
-    month_name = peewee.CharField(),
-    err_name= peewee.CharField(),
-    appsrv_name = peewee.CharField(),
+
+    cust_name= peewee.CharField()
+    month_name = peewee.CharField()
+    err_name= peewee.CharField()
+    appsrv_name = peewee.CharField()
     date_day = peewee.DateField()
     err_counts = peewee.IntegerField()
 
     class Meta:
         database = db
-DateWiseDetailKnownErrCounts.create_table()
+
+try:
+    DateWiseDetailKnownErrCounts.create_table()
+except peewee.InternalError:
+    print "DateWiseDetailKnownErrCounts table already exists!"
 
 
 class DateWiseErrCounts(peewee.Model):
-    id_field = PrimaryKeyField(),
-    cust_name = peewee.CharField(),
-    date_stamp = peewee.DateField(),
-    month_name = peewee.CharField(),
-    appsrv_name = peewee.CharField(),
+
+    cust_name = peewee.CharField()
+    date_stamp = peewee.DateField()
+    month_name = peewee.CharField()
+    appsrv_name = peewee.CharField()
     err_counts  = peewee.IntegerField()
 
     class Meta:
         database = db
-DateWiseErrCounts.create_table()
+
+try:
+    DateWiseErrCounts.create_table()
+except peewee.InternalError:
+    print "DateWiseErrCounts table already exists!"
+
