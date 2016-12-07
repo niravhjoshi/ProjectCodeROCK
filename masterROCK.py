@@ -5,8 +5,8 @@ import bz2
 from bz2 import decompress
 import  re
 import json
-import pymongo
-from pymongo.mongo_client import MongoClient
+#import pymongo
+#rom pymongo.mongo_client import MongoClient
 import peewee
 from peewee import *
 from DBORM import *
@@ -32,15 +32,15 @@ regex  = re.compile('0500 ERROR [()[\]{}][a-z]+[a-z]+.[a-z]+.[a-z]+.[a-z]+.[a-z]
 #THis function will decompress files for respecitive app server
 def DecompressBZ2files(userInDir,userOpDir):
 
-    Decomdirpath = userOpDir+"\\"+gsrvname
-    bz2filepath = userInDir+"\\"+gsrvname
+    Decomdirpath = userOpDir+"/"+gsrvname
+    bz2filepath = userInDir+"/"+gsrvname
     if os.path.exists(Decomdirpath) is False:
         os.makedirs(Decomdirpath)
         print "created dir decom"
 
     for file in os.listdir(bz2filepath):
-        archive_path = os.path.join(userInDir+"\\"+gsrvname, file)
-        outfile_path = os.path.join(userOpDir+"\\"+gsrvname, file[:-4])
+        archive_path = os.path.join(userInDir+"/"+gsrvname, file)
+        outfile_path = os.path.join(userOpDir+"/"+gsrvname, file[:-4])
         with open(archive_path, 'rb') as source, open(outfile_path, 'wb') as dest:
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
@@ -49,18 +49,18 @@ def DecompressBZ2files(userInDir,userOpDir):
 #This function will create new file named conclusion which will contain all error related lines only.
 def PatternMatchERROR(userOpDir):
     #out_file = open("DateWiseErrorCnt.json", "w")
-    #newpath = userOpDir+"\\"+gsrvname
+    #newpath = userOpDir+"/"+gsrvname
     newpath = userOpDir
     print newpath
     opfilepath = newpath
     concluerrfile = open(os.path.join(opfilepath,gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname),"w")
-    newpath = userOpDir+"\\"+gsrvname
+    newpath = userOpDir+"/"+gsrvname
     print newpath
     for eachfiles in os.listdir(newpath):
         i = 0
         print eachfiles
-        if os.path.exists(newpath+"\\"+eachfiles):
-            openeachfile=open(newpath+"\\"+eachfiles,'r')
+        if os.path.exists(newpath+"/"+eachfiles):
+            openeachfile=open(newpath+"/"+eachfiles,'r')
             for eachlinesinfile in openeachfile:
                 if re.match("(.*)(E)(R)(R)(O)(R)(.*)", eachlinesinfile, re.M):
                     print >> concluerrfile,eachlinesinfile,
@@ -105,7 +105,7 @@ def PatternMatchERROR(userOpDir):
 def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
 
     Countferrorrepo = usererrordictpath
-    Countconclufile = os.path.join(userOpDir+"\\"+(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+    Countconclufile = os.path.join(userOpDir+"/"+(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     Countferrorfile = open(Countferrorrepo)
 
 # We need put logic where after picking up each line from error dict file  it will search lines using date wise rather than just over seach from
@@ -170,7 +170,7 @@ def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
 #This function will be matching error lines from error repo files and if matched it will yank those lines from the files.
 def MatchandYankerrors(usererrodict,userOpDir):
     ferrorrepo = usererrodict
-    conclufile = os.path.join(userOpDir+"\\",(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+    conclufile = os.path.join(userOpDir+"/",(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
     ferrorfile = open(ferrorrepo)
     output = []
 
