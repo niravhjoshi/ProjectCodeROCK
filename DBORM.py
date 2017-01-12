@@ -53,3 +53,16 @@ try:
 except peewee.InternalError:
     print "DateWiseErrCounts table already exists!"
 
+class CustomerProdLogsLoca(peewee.Model):
+    cust_name = peewee.CharField()
+    add_date = peewee.DateField()
+    appsrv_logpath = peewee.CharField()
+    log_monitor = peewee.BooleanField(default=True)
+
+    class Meta:
+        database = db
+
+try:
+    CustomerProdLogsLoca.create_table()
+except peewee.InternalError:
+    print "Sorry Table CustomerProdLogsLoca already exists!"
