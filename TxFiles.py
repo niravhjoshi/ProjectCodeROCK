@@ -1,6 +1,7 @@
-import time,sys,os
+import time,sys,os,requests
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
+import json,urllib
 
 locallogslocation={'WKLogs':[
                '/Users/nirav//logs/saas-prodcm71-wk/saas-prodcm71-wk-app01',
@@ -37,18 +38,13 @@ toolslogslocation ={'WKLogs':[
                }
 
 
+
+
+
 class MyHandler(PatternMatchingEventHandler):
     patterns = ["*.BZ2", "*.bz2"]
 
     def process(self, event):
-        """
-        event.event_type
-            'modified' | 'created' | 'moved' | 'deleted'
-        event.is_directory
-            True | False
-        event.src_path
-            path/to/observed/file
-        """
         # the file will be processed there
         print event.src_path, event.event_type  # print now only for degug
         srcpath = event.src_path

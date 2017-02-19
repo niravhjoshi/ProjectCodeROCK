@@ -5,8 +5,6 @@ import bz2
 from bz2 import decompress
 import  re
 import json
-#import pymongo
-#rom pymongo.mongo_client import MongoClient
 import peewee
 from peewee import *
 from DBORM import *

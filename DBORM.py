@@ -56,13 +56,28 @@ except peewee.InternalError:
 class CustomerProdLogsLoca(peewee.Model):
     cust_name = peewee.CharField()
     add_date = peewee.DateField()
-    appsrv_logpath = peewee.CharField()
+    appsrv_tools_logpath = peewee.CharField()
+    appsrv_localws_logpath = peewee.CharField()
     log_monitor = peewee.BooleanField(default=True)
+
+    class Meta:
+        database = db
+try:
+    CustomerProdLogsLoca.create_table()
+except peewee.InternalError:
+    print "Sorry Table CustomerProdLogsLoca already exists!"
+
+class KnownErrorsDict(peewee.Model):
+    error_name =peewee.CharField()
+    err_date = peewee.DateField()
 
     class Meta:
         database = db
 
 try:
-    CustomerProdLogsLoca.create_table()
+    KnownErrorsDict.create_table()
 except peewee.InternalError:
-    print "Sorry Table CustomerProdLogsLoca already exists!"
+    print "Sorry Table KnownErrorsDict already exists!"
+
+
+
