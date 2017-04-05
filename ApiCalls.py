@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 tools_logslocation = []
 
-#Making call to api to get list of customer for which log monitoring is enable
+#Making call to api to get list of customer for which log monitoring is enable.
 response_customerwihLogMonitoringOn = urllib2.urlopen("http://127.0.0.1:8000/logconfig/CustomerLoglocationapi?fields=cust_name,srv1_name_dir,srv2_name_dir,srv98_name_dir,srv99_name_dir,appsrv_tools_logpath&log_monitor=True")
 data = json.load(response_customerwihLogMonitoringOn)
 print len(data)
@@ -91,6 +91,7 @@ for path in tools_logslocation:
 
         # start observer
 observer.start()
+
 
 
 
