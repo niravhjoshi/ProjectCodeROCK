@@ -32,10 +32,10 @@ class DateWiseDetailKnownErrCounts(peewee.Model):
         database = db
 
 try:
-    DateWiseDetailKnownErrCounts.create_table()
+    DateWiseDetailKnownErrCounts.create_table(fail_silently=True)
 except peewee.InternalError:
     print "DateWiseDetailKnownErrCounts table already exists!"
-
+    pass
 
 class DateWiseErrCounts(peewee.Model):
 
@@ -49,9 +49,10 @@ class DateWiseErrCounts(peewee.Model):
         database = db
 
 try:
-    DateWiseErrCounts.create_table()
+    DateWiseErrCounts.create_table(fail_silently=True)
 except peewee.InternalError:
     print "DateWiseErrCounts table already exists!"
+
 
 class CustomerProdLogsLoca(peewee.Model):
     cust_name = peewee.CharField()
@@ -63,9 +64,10 @@ class CustomerProdLogsLoca(peewee.Model):
     class Meta:
         database = db
 try:
-    CustomerProdLogsLoca.create_table()
+    CustomerProdLogsLoca.create_table(fail_silently=True)
 except peewee.InternalError:
     print "Sorry Table CustomerProdLogsLoca already exists!"
+
 
 class KnownErrorsDict(peewee.Model):
     error_name =peewee.CharField()
@@ -75,9 +77,10 @@ class KnownErrorsDict(peewee.Model):
         database = db
 
 try:
-    KnownErrorsDict.create_table()
+    KnownErrorsDict.create_table(fail_silently=True)
 except peewee.InternalError:
     print "Sorry Table KnownErrorsDict already exists!"
+    pass
 
 
 

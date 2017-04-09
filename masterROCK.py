@@ -8,15 +8,18 @@ import json
 import peewee
 from peewee import *
 from DBORM import *
-
+import MySQLdb
+import glob
 
 #Adding mongodb connection to my server docker DB container
 #client = MongoClient('mongodb://localhost:27017')
 #db = client.get_database('centurions')
 db = MySQLDatabase('centuriondb',user='root',password='gravitant')
+conn = MySQLdb.connect(user="root", passwd="gravitant", db="centuriondb")
+
 
 #Dict object for user input
-accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'CAP','5':'BB','6':'FIDO','7':'IBMCons'}
+accountname = {'1':'WK','2':'INAIL','3':'WIPRO','4':'WhirlPool','5':'BB','6':'FIDO','7':'IBMCons'}
 appserverlist ={'1':'App1','2':'App2','98':'App98','99':'App99'}
 moname ={'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'June','7':'Jul','8':'Aug','9':'Sep','10':'Oct','11':'Nov','12':'Dec'}
 
@@ -37,8 +40,8 @@ def DecompressBZ2files(userInDir,userOpDir):
         print "created dir decom"
 
     for file in os.listdir(bz2filepath):
-        archive_path = os.path.join(userInDir+"/"+gsrvname, file)
-        outfile_path = os.path.join(userOpDir+"/"+gsrvname, file[:-4])
+        archive_path = os.path.join(userInDir + "/" + gsrvname, file)
+        outfile_path = os.path.join(userOpDir + "/" + gsrvname, file[:-4])
         with open(archive_path, 'rb') as source, open(outfile_path, 'wb') as dest:
             dest.write(bz2.decompress(source.read()))
     print "Decmpression has been done for " +gsrvname
@@ -63,121 +66,81 @@ def PatternMatchERROR(userOpDir):
                 if re.match("(.*)(E)(R)(R)(O)(R)(.*)", eachlinesinfile, re.M):
                     print >> concluerrfile,eachlinesinfile,
                     i = i+1
-            print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-10:],i)
-            #error_count_json = {, , }
+            print "In Application server {} each day {}  Errors:{}".format(gsrvname,eachfiles[-14:-4],i)
 
             #MySQL DB insert code over here
             try:
-                DateWiseErrCounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,date_stamp=eachfiles[-10:],err_counts=i).save()
-
+                DateWiseErrCounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,date_stamp=eachfiles[-14:-4],err_counts=i).save()
                 print "Your result is inserted fine in DateWiseErrCounts"
 
             except peewee.InternalError:
                 print "There is something wrong in try"
 
-            '''
-            #MongoDB collection name
-            # DateWiseErrCounts insert document into this collection using the following method
-            #print "You have selected MongoDB collections name as {}".format(db.collection_names())
-            try:
-                resultforrow = db.DateWiseErrCounts.insert_one\
-                (
-                        {
-                        "cust_name": gacctname,
-                        "Month_name":gmoname,
-                        "Appsrv_name": gsrvname,
-                        "date_stamp": eachfiles[-10:],
-                        "ErrorCounts": i
-                        }
-                )
-                print "Your result is inserted fine{}".format(resultforrow.inserted_id)
-
-            except:
-                print "There is something wrong in try"
-
-        else:
-            print "No such file present"
-        '''
-
 #This function will just count error message reference to error dict and our conclusion file
-def CountRepoErrorinConclufile(usererrordictpath,userOpDir):
+def CountRepoErrorinConclufile(userOpDir):
 
-    Countferrorrepo = usererrordictpath
+    #Countferrorrepo = usererrordictpath
     Countconclufile = os.path.join(userOpDir+"/"+(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
-    Countferrorfile = open(Countferrorrepo)
-
-# We need put logic where after picking up each line from error dict file  it will search lines using date wise rather than just over seach from
-#Conclusion File through which we will get more granualar report about understanding error pattern datewise.
-    for errlines in Countferrorfile:
+    #Countferrorfile = open(Countferrorrepo)
+    #Open table fetch rows one by one for matching against our file
+    cur1 = conn.cursor()
+    cur1.execute("SELECT Error_name FROM ErrorsDict_errorsdict")
+    row = cur1.fetchone()
+    while row is not None:
+        c = 0
+        newerrliens = row[0].strip()  # error_dict file each line strip and spilit
+        i = 0
+        confile = open(Countconclufile, "r+")  # This will keep opening file every time when we need new error to search.
+        confilelines = confile.readlines()  # This will read all lines from file.
+        confile.seek(0) # Setting file scaning pointer from begining.
+        print "\n\n\nNow looking for this error message {}".format(newerrliens)
         groupbyDate = []  # Create List for the Dates Entries to be included.
-        Countnewerrlines = errlines.strip() # Strip error dict file line for any unwanted things
-        confile = open(Countconclufile,"r+")#This will keep opening file every time when we need new error to search.
-        confilelines = confile.readlines() #This will read all lines from file.
-        confile.seek(0)
-        c=0
-        for eachlineinconfile in confilelines:  # Pick each line from error_dict
-            new_eachlineinconfile = eachlineinconfile.strip()  #
-
-            if re.match(only_datePattern2,new_eachlineinconfile):
-                newDate = new_eachlineinconfile[:10]
+        for eachlineinconfile in confilelines:  # Pick each line from errorconclusion file
+            new_eachlineinconfile = eachlineinconfile.strip()
+            if re.match(only_datePattern2,new_eachlineinconfile): # Reg Exp to extract date from error conclusion file
+                newDate = new_eachlineinconfile[:10] #Extract Date and storing it.
                 if newDate not in groupbyDate:
-                    groupbyDate.append(new_eachlineinconfile[:10])
+                    groupbyDate.append(newDate)
                     errcnt = 0
-                    print "Group Date==============================>:{}".format(groupbyDate[-1])
 
+                    print "\n\n We are grouping by Date==============================>:{}".format(groupbyDate[-1])
+                if newerrliens in new_eachlineinconfile:
+                    c = c + 1
+                    errcnt = errcnt + 1
+                    print "This error {} came on {} these many times{} ".format(newerrliens, errcnt,
+                                                                                    groupbyDate[-1])
+                    try:
+                        DateWiseDetailKnownErrCounts(cust_name=gacctname, month_name=gmoname, appsrv_name=gsrvname,
+                                                     err_name=newerrliens, err_counts=errcnt,
+                                                     date_day=groupbyDate[-1]).save()
+                        print "Your result is inserted fine in DateWiseDetailKnownErrCounts"
 
+                    except peewee.InternalError:
+                        print "There is something wrong in try"
+                    print "\nThis error {} came on {} these many times{} ".format(newerrliens, groupbyDate[-1],
+                                                                                  errcnt)
 
-            if Countnewerrlines in new_eachlineinconfile:
-                c=c+1
-                errcnt = errcnt +1 # this count only set to 0 after new error picked up.
-                print "This error {} came on {} these many times{} ".format(Countnewerrlines,errcnt,groupbyDate[-1])
-                #MySQL Connection and insert
-                try:
-                    DateWiseDetailKnownErrCounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,err_name=Countnewerrlines,err_counts=errcnt,date_day=groupbyDate[-1]).save()
-                    print "Your result is inserted fine in DateWiseDetailKnownErrCounts"
+        print "\n\nThis line counts {}  ====>{}".format(newerrliens, c)
+        row = cur1.fetchone()
+    cur1.close()
+    #2conn.close()
 
-                except peewee.InternalError:
-                    print "There is something wrong in try"
-
-                '''
-                # MongoDB collection name
-                # DateWiseDetailKnownErrCounts insert document into this collection using the following method
-                # print "You have selected MongoDB collections name as {}".format(db.collection_names())
-                try:
-                    resultforrow = db.DateWiseDetailKnownErrCounts.insert_one \
-                            (
-                            {
-                                "cust_name": gacctname,
-                                "Month_name": gmoname,
-                                "Appsrv_name": gsrvname,
-                                "Err_Name":Countnewerrlines,
-                                "ErrorCounts":errcnt,
-                                "date_day":groupbyDate[-1]
-                            }
-                        )
-                    print "Your result is inserted fine{}".format(resultforrow.inserted_id)
-
-                except:
-                    print "There is something wrong in try"
-                '''
-
-        print "\n\nThis line counts {}  ====>{}".format(Countnewerrlines,c)
-
-#Use delimeter  format and export this result in to CSV -- Add feature
 
 #This function will be matching error lines from error repo files and if matched it will yank those lines from the files.
-def MatchandYankerrors(usererrodict,userOpDir):
-    ferrorrepo = usererrodict
-    conclufile = os.path.join(userOpDir+"/",(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
-    ferrorfile = open(ferrorrepo)
-    output = []
+def MatchandYankerrors(userOpDir):
 
-    for errlines in ferrorfile: #Pick each line from error_dict
+    conclufile = os.path.join(userOpDir+"/",(gsrvname+"conclusion"+"_"+gacctname+"_"+gmoname))
+    #ferrorfile = open(ferrorrepo)
+    output = []
+    #In this code block we will fetch one by one rows from DB Table ErorrDict
+    cur = conn.cursor()
+    cur.execute("SELECT Error_name FROM ErrorsDict_errorsdict")
+    row = cur.fetchone()
+    while row is not None:
+
+        #for errlines in ferrorfile: #Pick each line from error_dict
         c = 0
-        newerrliens = errlines.strip()  # error_dict file each line strip and spilit
-        #confile = open(conclufile,"r+")#This will keep opening file every time when we need new error to search.
-        #confilelines = confile.readlines() #This will read all lines from file.
-        #confile.seek(0)
+        newerrliens = row[0].strip()  # error_dict file each line strip and spilit
         i=0
         for line in fileinput.input(conclufile,inplace=1,backup='.orig'):
             line = line.strip()
@@ -185,7 +148,10 @@ def MatchandYankerrors(usererrodict,userOpDir):
                 pass
             else:
                 print line
-        fileinput.close()
+        row = cur.fetchone()
+    fileinput.close()
+    cur.close()
+    conn.close()
 
 
 #Main function of program.
@@ -259,21 +225,21 @@ def main():
             decompath = str(user_DecomDir)
             break
 
-    while True:
-        user_errordict =  raw_input("Please enter full path of error dict file name:->")
-        if os.path.exists(user_errordict) is False:
-            print "I could not find that path in your file system please ensure it is correct!!! " + str(user_errordict)
-            continue
-        else:
-            errordictfilepath = str(user_errordict)
-            break
+    #while True:
+        #user_errordict =  raw_input("Please enter full path of error dict file name:->")
+        #if os.path.exists(user_errordict) is False:
+            #print "I could not find that path in your file system please ensure it is correct!!! " + str(user_errordict)
+            #continue
+        #else:
+           #errordictfilepath = str(user_errordict)
+           #break
 
 
     #Calling All function one by one.
     DecompressBZ2files(str(user_dirInput),str(user_DecomDir))
     PatternMatchERROR(str(user_DecomDir))#Calling ERROR Keyword matching function
-    CountRepoErrorinConclufile(str(user_errordict),str(user_DecomDir))
-    MatchandYankerrors(str(user_errordict),str(user_DecomDir))
+    CountRepoErrorinConclufile(str(user_DecomDir))
+    MatchandYankerrors(str(user_DecomDir))
 
 
 if __name__ == '__main__':
