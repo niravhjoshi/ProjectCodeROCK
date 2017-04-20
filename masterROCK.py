@@ -70,7 +70,7 @@ def PatternMatchERROR(userOpDir):
 
             #MySQL DB insert code over here
             try:
-                DateWiseErrCounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,date_stamp=eachfiles[-14:-4],err_counts=i).save()
+                centurionapi_datewiseerrcounts(cust_name=gacctname,month_name=gmoname,appsrv_name=gsrvname,date_stamp=eachfiles[-14:-4],err_counts=i).save()
                 print "Your result is inserted fine in DateWiseErrCounts"
 
             except peewee.InternalError:
@@ -106,13 +106,13 @@ def CountRepoErrorinConclufile(userOpDir):
                     print "\n\n We are grouping by Date==============================>:{}".format(groupbyDate[-1])
                 if newerrliens in new_eachlineinconfile:
                     c = c + 1
-                    errcnt = errcnt + 1
+                    errcnt = 1
                     print "This error {} came on {} these many times{} ".format(newerrliens, errcnt,
                                                                                     groupbyDate[-1])
                     try:
-                        DateWiseDetailKnownErrCounts(cust_name=gacctname, month_name=gmoname, appsrv_name=gsrvname,
+                        centurionapi_datewisedetailknownerrcounts(cust_name=gacctname, month_name=gmoname, appsrv_name=gsrvname,
                                                      err_name=newerrliens, err_counts=errcnt,
-                                                     date_day=groupbyDate[-1]).save()
+                                                     date_date=groupbyDate[-1]).save()
                         print "Your result is inserted fine in DateWiseDetailKnownErrCounts"
 
                     except peewee.InternalError:

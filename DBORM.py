@@ -19,25 +19,25 @@ for book in Book.filter(author="me"):
     print book.title
 '''
 
-class DateWiseDetailKnownErrCounts(peewee.Model):
+class centurionapi_datewisedetailknownerrcounts(peewee.Model):
 
     cust_name= peewee.CharField()
     month_name = peewee.CharField()
     err_name= peewee.CharField()
     appsrv_name = peewee.CharField()
-    date_day = peewee.DateField()
+    date_date = peewee.DateField()
     err_counts = peewee.IntegerField()
 
     class Meta:
         database = db
 
 try:
-    DateWiseDetailKnownErrCounts.create_table(fail_silently=True)
+    centurionapi_datewisedetailknownerrcounts.create_table(fail_silently=True)
 except peewee.InternalError:
-    print "DateWiseDetailKnownErrCounts table already exists!"
+    print "centurionapi_datewisedetailknownerrcounts table already exists!"
     pass
 
-class DateWiseErrCounts(peewee.Model):
+class centurionapi_datewiseerrcounts(peewee.Model):
 
     cust_name = peewee.CharField()
     date_stamp = peewee.DateField()
@@ -49,7 +49,7 @@ class DateWiseErrCounts(peewee.Model):
         database = db
 
 try:
-    DateWiseErrCounts.create_table(fail_silently=True)
+    centurionapi_datewiseerrcounts.create_table(fail_silently=True)
 except peewee.InternalError:
     print "DateWiseErrCounts table already exists!"
 
